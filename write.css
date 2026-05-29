@@ -1,0 +1,169 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+.container.editor-container {
+  max-width: 1400px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 48px;
+  margin: 40px 0;
+  color: #2c3e50;
+}
+
+.editor-inner-container {
+  display: flex;
+  gap: 10px;
+  background: white;
+  border-radius: 25px;
+}
+
+.editor-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* 左 */
+.story-panel {
+  flex: 1.2;
+  background: rgba(44, 62, 80, 0.1);
+  border-radius: 40px;
+  padding: 30px;
+  min-height: 700px;
+}
+
+.story-panel h2 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+textarea {
+  flex: 1;
+  height: 560px;
+  border: none;
+  border-radius: 25px;
+  padding: 20px;
+  resize: none;
+  font-size: 22px;
+  line-height: 1.5; /* 1.5倍 = 33px */
+  outline: none;
+}
+
+#sound-indicator-bar {
+  width: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+  margin: 15px 0 15px 15px;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden; /* はみ出したマーカーを隠す */
+}
+
+.sound-marker-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.sound-marker {
+  position: absolute;
+  width: 100%;
+  border-radius: 2px;
+}
+/* 右 */
+.right-panel {
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.sound-panel,
+.library-panel {
+  background: rgba(44, 62, 80, 0.1);
+  border-radius: 40px;
+  padding: 30px;
+}
+
+.sound-panel {
+  min-height: 380px;
+}
+
+.library-panel {
+  min-height: 200px;
+}
+
+.sound-panel h2,
+.library-panel h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.sound-category {
+  margin-bottom: 25px;
+}
+
+.sound-category h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #34495e;
+}
+
+.guide {
+  margin-bottom: 25px;
+  color: #222;
+}
+
+.sound-button {
+  width: 100%;
+  border: none;
+  background: white;
+  padding: 18px;
+  border-radius: 20px;
+  font-size: 22px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: 0.2s;
+  border: 2px solid transparent;
+}
+
+#add-sound-btn, #add-bgm-btn, #add-se-btn, #add-bg-btn, #open-sound-library {
+  background: white;
+}
+
+.sound-button:hover {
+  background: #f8f9fa;
+  transform: scale(1.01);
+}
+
+.sound-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sound-card {
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 16px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  transition: 0.2s;
+}
+
+.sound-card:hover {
+  background: #f0f0f0;
+}

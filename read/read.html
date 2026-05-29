@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>終電の後 - SoundNovel</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body class="underwater-theme">
+
+  <!-- 画面に固定される音量調節バー -->
+  <div class="volume-control">
+    <span class="volume-icon">♪</span>
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.4">
+  </div>
+
+  <div class="container camera-down-enter">
+    <header>
+      <nav>
+        <div class="logo"><a href="novels.html" style="text-decoration: none; color: inherit;">← 戻る</a></div>
+        <div class="logo" style="position: absolute; left: 50%; transform: translateX(-50%);">SoundNovel</div>
+      </nav>
+    </header>
+
+    <main class="reader-section">
+      <article class="reader-content">
+        <h1 class="story-title">終電の後</h1>
+        <p class="story-author-name">niraGPT 著</p>
+
+        <div class="text-body">
+          <p>[BGM:audio-ame]駅に着いた頃には、終電はもう出たあとだった。</p>
+          <p>ホームに残っていたのは、白い蛍光灯の音と、ガラスを叩く雨だけ。</p>
+          <p>「……やっちゃったな」</p>
+          <p>スマホを見る。</p>
+          <p>充電、2%。</p>
+          <p>タクシーを呼ぶには心許ない数字だった。</p>
+          <p>駅員室の灯りも消えている。</p>
+          <p>完全に、ひとり。</p>
+          <p>ごろ、と空が鳴った。</p>
+          <p>反射的に肩が跳ねる。</p>
+          <p>雨宿りくらいできないかと思って、改札横の待合室へ向かった。</p>
+          <p>ガラス戸に手をかける。</p>
+          <p>[SE:audio-doa][BGM:audio-inaka]――ガチャ。</p>
+          <p>開いた。</p>
+          <p>誰もいない。</p>
+          <p>古い暖房の匂いだけが、微かに残っている。</p>
+          <p>部屋の隅に、一冊のノートが置いてあった。</p>
+          <p>駅の日誌……ではない。</p>
+          <p>表紙に、マジックで雑に文字が書かれている。</p>
+          <p>「終電を逃した人へ」</p>
+          <p>「……なにこれ」</p>
+          <p>なんとなく、開いた。</p>
+          <p>最初のページ。</p>
+          <p>“ここに来た人は、必ずひとつ忘れ物をしています”</p>
+          <p>「は？」</p>
+          <p>苦笑する。</p>
+          <p>財布もある。</p>
+          <p>スマホもある。</p>
+          <p>傘……は元々持ってない。</p>
+          <p>次のページ。</p>
+          <p>“あなたは、何を失くしましたか？”</p>
+          <p>その瞬間。ポケットが軽いことに気づいた。</p>
+          <p>家の鍵。ない。</p>
+          <p>「え……」</p>
+          <p>カバンを見る。</p>
+          <p>ない。</p>
+          <p>ポケットを探る。</p>
+          <p>ない。</p>
+          <p>さっきまで、あったはずなのに。</p>
+          <p>ノートの最後のページをめくる。</p>
+          <p>そこには、たった一行。</p>
+          <p>“見つけたければ、もう一度ホームへ”</p>
+          <p>外を見る。</p>
+          <p>誰もいないホーム。</p>
+          <p>……のはずだった。</p>
+          <p>ベンチに、誰か座っている。</p>
+          <p>白い服の人影。</p>
+          <p>さっきはいなかった。</p>
+          <p>こちらを見ている。</p>
+          <p>いや。</p>
+          <p>――待っている。</p>
+          <p>スマホが震えた。</p>
+          <p>母からメッセージ。</p>
+          <p>「鍵、机に置きっぱなしだったよ」</p>
+          <p>沈黙。</p>
+          <p>[BGM:audio-huyu]ホームを見る。</p>
+          <p>もう、誰もいなかった。</p>
+          <p>少し笑ってしまった。</p>
+          <p>疲れていたのかもしれない。</p>
+          <p>雨はまだ降っていた。けれど、さっきより少しだけ、静かに聞こえた。</p>
+          <div id="story-end-marker" class="story-end">END</div>
+        </div>
+      </article>
+
+      <div class="reader-footer">
+        <button id="back-to-library" class="btn primary">作品一覧へ戻る</button>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; SoundNovel. Music by <a href="https://az-ho.org/" target="_blank" rel="noopener noreferrer" style="color: inherit;">独り音</a> / SE by <a href="https://soundeffect-lab.info/" target="_blank" rel="noopener noreferrer" style="color: inherit;">効果音ラボ</a></p>
+    </footer>
+  </div>
+
+  <!-- 音声素材 -->
+  <audio id="audio-haru" src="../audio/01-haru.mp3" loop></audio>
+  <audio id="audio-natu" src="../audio/01-natu.mp3" loop></audio>
+  <audio id="audio-aki" src="../audio/01-aki.mp3" loop></audio>
+  <audio id="audio-huyu" src="../audio/01-huyu.mp3" loop></audio>
+  <audio id="audio-ame" src="../audio/02-ame.mp3" loop></audio>
+  <audio id="audio-kaze" src="../audio/02-kaze.mp3" loop></audio>
+  <audio id="audio-gakkou" src="../audio/03-gakkou.mp3" loop></audio>
+  <audio id="audio-tokai" src="../audio/03-tokai.mp3" loop></audio>
+  <audio id="audio-inaka" src="../audio/03-inaka.mp3" loop></audio>
+  <audio id="audio-mori" src="../audio/03-mori.mp3" loop></audio>
+  <audio id="audio-umi" src="../audio/03-umi.mp3" loop></audio>
+  <audio id="audio-sentou" src="../audio/04-sentou.mp3" loop></audio>
+  <audio id="audio-bouken" src="../audio/04-bouken.mp3" loop></audio>
+  <audio id="audio-mekuru" src="../audio/10-mekuru.mp3"></audio>
+  <audio id="audio-doa" src="../audio/10-doa.mp3"></audio>
+  <audio id="audio-aruku" src="../audio/10-aruku.mp3"></audio>
+  <audio id="audio-densya" src="../audio/10-densya.mp3"></audio>
+  <audio id="audio-hasiru" src="../audio/10-hasiru.mp3"></audio>
+  <audio id="audio-mati" src="../audio/10-mati.mp3"></audio>
+  <audio id="audio-natu-se" src="../audio/10-natu.mp3"></audio>
+  <audio id="audio-nokku" src="../audio/10-nokku.mp3"></audio>
+  <audio id="audio-tokei" src="../audio/10-tokei.mp3"></audio>
+  <audio id="audio-umi-se" src="../audio/10-umi.mp3"></audio>
+
+  <script src="../script.js"></script>
+</body>
+</html>

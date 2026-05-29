@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BGM / SE 一覧 - SoundNovel</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../write.css">
+</head>
+<body>
+
+  <!-- 共通：音量調節バー -->
+  <div class="volume-control">
+    <span class="volume-icon">♪</span>
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.4">
+  </div>
+
+  <div class="container camera-down-enter">
+    <!-- 共通：背景の雲 -->
+    <div class="clouds-container">
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+    </div>
+
+    <header>
+      <nav>
+        <div class="logo"><a href="../home.html" style="text-decoration: none; color: inherit;">SoundNovel</a></div>
+      </nav>
+      <button id="back-to-editor-top" class="btn primary" style="padding: 8px 16px; font-size: 0.9rem; margin-top: 10px;">執筆に戻る</button>
+    </header>
+
+    <main class="library-section" style="max-width: 800px; margin: 0 auto;">
+      <h2 class="section-title">BGM / SE 一覧</h2>
+      
+      <div class="library-panel" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 40px; padding: 40px;">
+        <div class="sound-category">
+          <h3>季節</h3>
+          <div class="sound-list">
+            <div class="sound-card" data-audio="audio-haru">🌸 春</div>
+            <div class="sound-card" data-audio="audio-natu">🌻 夏</div>
+            <div class="sound-card" data-audio="audio-aki">🍂 秋</div>
+            <div class="sound-card" data-audio="audio-huyu">❄️ 冬</div>
+            <div class="sound-card" data-audio="audio-natu-se">🌻 夏（SE）</div>
+          </div>
+        </div>
+
+        <div class="sound-category">
+          <h3>天気</h3>
+          <div class="sound-list">
+            <div class="sound-card" data-audio="audio-ame">🌧️ 雨</div>
+            <div class="sound-card" data-audio="audio-kaze">💨 風</div>
+          </div>
+        </div>
+
+        <div class="sound-category">
+          <h3>場所</h3>
+          <div class="sound-list">
+            <div class="sound-card" data-audio="audio-gakkou">🏫 学校</div>
+            <div class="sound-card" data-audio="audio-tokai">🏙️ 都会</div>
+            <div class="sound-card" data-audio="audio-inaka">🏡 田舎</div>
+            <div class="sound-card" data-audio="audio-mori">🌲 森</div>
+            <div class="sound-card" data-audio="audio-umi">🌊 海</div>
+            <div class="sound-card" data-audio="audio-umi-se">🌊 海（SE）</div>
+            <div class="sound-card" data-audio="audio-densya">🚃 電車（SE）</div>
+            <div class="sound-card" data-audio="audio-mati">🏙️ 街（SE）</div>
+          </div>
+        </div>
+
+        <div class="sound-category">
+          <h3>行動・その他</h3>
+          <div class="sound-list">
+            <div class="sound-card" data-audio="audio-aruku">🚶 歩く（SE）</div>
+            <div class="sound-card" data-audio="audio-hasiru">🏃 走る（SE）</div>
+            <div class="sound-card" data-audio="audio-doa">🚪 ドア（SE）</div>
+            <div class="sound-card" data-audio="audio-nokku">✊ ノック（SE）</div>
+            <div class="sound-card" data-audio="audio-tokei">⏰ 時計（SE）</div>
+          </div>
+        </div>
+
+        <div class="sound-category">
+          <h3>雰囲気</h3>
+          <div class="sound-list">
+            <div class="sound-card" data-audio="audio-sentou">⚔️ 戦闘</div>
+            <div class="sound-card" data-audio="audio-bouken">🧭 冒険</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center;">
+          <button id="back-to-editor" class="btn primary">執筆に戻る</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; SoundNovel. Music by <a href="https://az-ho.org/" target="_blank" rel="noopener noreferrer" style="color: inherit;">独り音</a> / SE by <a href="https://soundeffect-lab.info/" target="_blank" rel="noopener noreferrer" style="color: inherit;">効果音ラボ</a></p>
+    </footer>
+  </div>
+
+  <audio id="audio-home" src="../audio/00-home.mp3" loop></audio>
+  <audio id="audio-haru" src="../audio/01-haru.mp3" loop></audio>
+  <audio id="audio-natu" src="../audio/01-natu.mp3" loop></audio>
+  <audio id="audio-aki" src="../audio/01-aki.mp3" loop></audio>
+  <audio id="audio-huyu" src="../audio/01-huyu.mp3" loop></audio>
+  <audio id="audio-ame" src="../audio/02-ame.mp3" loop></audio>
+  <audio id="audio-kaze" src="../audio/02-kaze.mp3" loop></audio>
+  <audio id="audio-gakkou" src="../audio/03-gakkou.mp3" loop></audio>
+  <audio id="audio-tokai" src="../audio/03-tokai.mp3" loop></audio>
+  <audio id="audio-inaka" src="../audio/03-inaka.mp3" loop></audio>
+  <audio id="audio-mori" src="../audio/03-mori.mp3" loop></audio>
+  <audio id="audio-umi" src="../audio/03-umi.mp3" loop></audio>
+  <audio id="audio-sentou" src="../audio/04-sentou.mp3" loop></audio>
+  <audio id="audio-bouken" src="../audio/04-bouken.mp3" loop></audio>
+  <audio id="audio-aruku" src="../audio/10-aruku.mp3"></audio>
+  <audio id="audio-densya" src="../audio/10-densya.mp3"></audio>
+  <audio id="audio-doa" src="../audio/10-doa.mp3"></audio>
+  <audio id="audio-hasiru" src="../audio/10-hasiru.mp3"></audio>
+  <audio id="audio-mati" src="../audio/10-mati.mp3"></audio>
+  <audio id="audio-natu-se" src="../audio/10-natu.mp3"></audio>
+  <audio id="audio-nokku" src="../audio/10-nokku.mp3"></audio>
+  <audio id="audio-tokei" src="../audio/10-tokei.mp3"></audio>
+  <audio id="audio-umi-se" src="../audio/10-umi.mp3"></audio>
+  <audio id="audio-mekuru" src="../audio/10-mekuru.mp3"></audio>
+
+  <script src="../script.js"></script>
+</body>
+</html>

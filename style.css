@@ -1,0 +1,351 @@
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+  /* デフォルトの背景（index.html用） */
+  background: linear-gradient(180deg, #ade1ff 0%, #ffffff 100%);
+}
+
+/* 砂浜のテーマ (novels.html用) */
+.beach-theme { /* bodyに直接適用 */
+  background: 
+    /* 砂浜のきらめきや貝殻のような光 */
+    radial-gradient(circle at 15% 90%, rgba(255, 255, 255, 0.6) 0%, transparent 2%),
+    radial-gradient(circle at 35% 85%, rgba(255, 250, 200, 0.5) 0%, transparent 2.5%),
+    radial-gradient(circle at 65% 92%, rgba(255, 255, 255, 0.6) 0%, transparent 3%),
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 2%),
+    /* 砂浜に続く白い砂の道 */
+    linear-gradient(105deg, transparent 46%, rgba(255, 255, 255, 0.3) 48%, rgba(255, 255, 255, 0.3) 52%, transparent 54%) bottom center / 100% 50% no-repeat,
+    /* 空、海、波打ち際、砂浜の境界 */
+    linear-gradient(to top, #f5e6ca 0%, #fff9e6 35%, #ffffff 42%, #90e0ef 50%, #ade1ff 100%);
+}
+
+/* 海の中テーマ (read.html用) */
+.underwater-theme {
+  background: 
+    radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
+    linear-gradient(180deg, #00b4d8 0%, #0077b6 50%, #023e8a 100%);
+  color: #ffffff;
+}
+
+.underwater-theme .logo { color: #fff; }
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+  background: transparent; /* bodyが背景を持つため、コンテナは透明に */
+}
+
+/* カメラが下がる（コンテンツが上に消える）演出 */
+.camera-down-leave {
+  transform: translateY(-100vh) scale(1.1);
+  opacity: 0;
+}
+
+/* カメラが降りてくる（コンテンツが下から現れる）演出 */
+.camera-down-enter {
+  animation: cameraEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes cameraEnter {
+  from {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 雲のスタイルとアニメーション */
+.clouds-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw; /* コンテナの幅に縛られず画面いっぱいに広げる */
+  height: 100%;
+  overflow: hidden;
+  z-index: -1; /* bodyの背景よりは上で、containerよりは下 */
+  pointer-events: none;
+  /* 地平線（50%付近）で雲が自然に消えるようにマスクをかける */
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 50%);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 50%);
+}
+
+.cloud {
+  position: absolute;
+  background: #fff;
+  border-radius: 100px;
+  opacity: 0.6;
+  filter: blur(10px);
+  animation: drift linear infinite;
+}
+
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.c1 { width: 200px; height: 60px; top: 15%; left: -250px; animation-duration: 40s; }
+.c1::before { width: 80px; height: 80px; top: -40px; left: 30px; }
+.c1::after { width: 100px; height: 100px; top: -50px; left: 80px; }
+
+.c2 { width: 150px; height: 50px; top: 40%; left: -200px; animation-duration: 55s; animation-delay: 5s; }
+.c2::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+.c2::after { width: 80px; height: 80px; top: -40px; left: 60px; }
+
+.c3 { width: 250px; height: 70px; top: 70%; left: -300px; animation-duration: 48s; animation-delay: 2s; }
+.c3::before { width: 90px; height: 90px; top: -45px; left: 40px; }
+.c3::after { width: 110px; height: 110px; top: -55px; left: 100px; }
+
+@keyframes drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 400px)); }
+}
+
+header {
+  padding: 20px 0;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 15px;
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.volume-icon {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+#volume-slider {
+  width: 80px;
+  cursor: pointer;
+}
+
+.hero-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px 0;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin-bottom: 40px;
+}
+
+.library-section {
+  padding: 40px 0;
+  z-index: 1;
+}
+
+.section-title {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.reader-section {
+  padding: 60px 0;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.reader-content {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  line-height: 2.2;
+  margin-bottom: 40px;
+}
+
+.story-title { font-size: 2.2rem; margin-bottom: 5px; text-align: center; color: #fff; }
+.story-author-name { text-align: center; color: #bdc3c7; margin-bottom: 40px; }
+
+/* 読了後のEND表示 */
+.story-end {
+  display: none;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0 0; /* 本文の段落と同じ間隔に設定 */
+  color: #fff;
+  opacity: 0;
+}
+
+.story-end.is-visible {
+  display: block;
+  animation: fadeInEnd 3s ease forwards;
+}
+
+@keyframes fadeInEnd {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.text-body p {
+  display: none; /* 最初は非表示にし、空間を占有しないようにする */
+  margin-bottom: 1.5rem;
+}
+
+.text-body p.is-placeholder {
+  display: block; /* 空間だけ確保する */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.text-body p.is-visible {
+  display: block; /* 文章が表示されるたびに下に延長される */
+  animation: fadeInLine 0.6s ease forwards;
+}
+
+@keyframes fadeInLine {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reader-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  padding-bottom: 60px;
+}
+
+.story-card {
+  background: rgba(255, 255, 255, 0.2); /* 白文字が見えるよう少し暗めに調整 */
+  padding: 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+}
+
+.story-card h3 { margin: 0 0 10px 0; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.story-author { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 15px; }
+.story-desc { font-size: 0.95rem; color: #555; margin-bottom: 20px; flex-grow: 1; }
+
+.btn {
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.cta-buttons .btn { margin: 0 10px; }
+.story-card .btn { padding: 10px 25px; font-size: 0.9rem; align-self: flex-start; }
+
+.primary {
+  background-color: #3498db;
+  color: white;
+  border: 2px solid #ffffff !important;
+}
+
+.secondary {
+  background-color: #fff;
+  border: 2px solid #3498db !important;
+  color: #3498db;
+}
+
+.danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* 音声再生許可プロンプト (削除) */
+#audio-permission-prompt {
+  display: none; /* 完全に非表示にする */
+}
+
+/* 新しい音声再生ヒント */
+#audio-play-hint {
+  position: fixed; /* 画面に固定 */
+  /* topとrightはJavaScriptで動的に設定される */
+  background: rgba(0, 0, 0, 0.5); /* 半透明の背景 */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem; /* 小さな文字 */
+  z-index: 9998; /* 音量コントロールバーの下、他のコンテンツの上 */
+  text-align: center;
+  white-space: nowrap; /* テキストの折り返しを防ぐ */
+  display: none; /* デフォルトでは非表示、JSで制御 */
+  /* backdrop-filter: blur(5px); */ /* 必要であれば背景をぼかす */
+}
+
+footer {
+  text-align: center;
+  padding: 20px 0;
+  font-size: 0.8rem;
+  color: #bdc3c7;
+}
