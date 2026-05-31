@@ -1086,42 +1086,55 @@ if (editorTextArea) {
 // HTML側に id="login-btn" のボタンがあることを想定しています
 const loginBtn = document.getElementById('login-btn');
 if (loginBtn) {
-  loginBtn.addEventListener('click', () => {
-    const errorMsgEl = document.getElementById('auth-error-message');
-    if (errorMsgEl) errorMsgEl.textContent = ''; // 前回のエラーをクリア
+  // firebase.js (type="module") によって window に Firebase 関連の関数がセットされるのを待つ
+  const initAuth = () => {
+    // window.auth や window.signInWithPopup が準備できるまで待機
+    if (!window.auth || !window.signInWithPopup || !window.onAuthStateChanged) {
+      setTimeout(initAuth, 50); // 50ms ごとに再チェック
+      return;
+    }
 
-    if (!window.auth.currentUser) {
-      window.signInWithPopup(window.auth, window.provider)
-        .catch(e => {
-          console.error("ログインエラー:", e);
-          if (errorMsgEl) {
-            if (e.code === 'auth/unauthorized-domain') {
-              errorMsgEl.textContent = "このドメイン（URL）はFirebaseで許可されていません。Firebaseコンソールの『承認済みドメイン』に現在のURL（localhostなど）を追加してください。";
-            } else if (e.code === 'auth/operation-not-allowed') {
-              errorMsgEl.textContent = "Googleログインが有効になっていません。Firebaseコンソールの『Sign-in method』でGoogleを有効にしてください。";
-            } else {
-              errorMsgEl.textContent = `エラー: ${e.code}`;
+    // ログイン・ログアウトのクリックイベント
+    loginBtn.addEventListener('click', () => {
+      const errorMsgEl = document.getElementById('auth-error-message');
+      if (errorMsgEl) errorMsgEl.textContent = ''; // 前回のエラーをクリア
+
+      if (!window.auth.currentUser) {
+        // Googleログインポップアップを表示
+        window.signInWithPopup(window.auth, window.provider)
+          .catch(e => {
+            console.error("ログインエラー:", e);
+            if (errorMsgEl) {
+              if (e.code === 'auth/unauthorized-domain') {
+                errorMsgEl.textContent = "このドメインはFirebaseで許可されていません。";
+              } else if (e.code === 'auth/operation-not-allowed') {
+                errorMsgEl.textContent = "Googleログインが無効です。Firebaseの設定を確認してください。";
+              } else {
+                errorMsgEl.textContent = `エラー: ${e.code}`;
+              }
             }
-          }
-        });
-    } else {
-      if (confirm('ログアウトしますか？')) {
-        window.signOut(window.auth);
+          });
+      } else {
+        if (confirm('ログアウトしますか？')) {
+          window.signOut(window.auth);
+        }
       }
-    }
-  });
+    });
 
-  window.onAuthStateChanged(window.auth, (user) => {
-    if (user) {
-      // ログイン時はアイコンと名前を表示（アカウント情報エリアに見えるように）
-      const photo = user.photoURL ? `<img src="${user.photoURL}" style="width:20px; height:20px; border-radius:50%;">` : '';
-      loginBtn.innerHTML = `${photo}<span>${user.displayName || 'ログイン中'}</span>`;
-      loginBtn.title = "クリックしてログアウト";
-    } else {
-      loginBtn.innerHTML = '<span>Googleでログイン</span>';
-      loginBtn.title = "";
-    }
-  });
+    // ログイン状態の監視とUI更新
+    window.onAuthStateChanged(window.auth, (user) => {
+      if (user) {
+        const photo = user.photoURL ? `<img src="${user.photoURL}" style="width:20px; height:20px; border-radius:50%;">` : '';
+        loginBtn.innerHTML = `${photo}<span>${user.displayName || 'ログイン中'}</span>`;
+        loginBtn.title = "クリックしてログアウト";
+      } else {
+        loginBtn.innerHTML = '<span>Googleでログイン</span>';
+        loginBtn.title = "";
+      }
+    });
+  };
+
+  initAuth();
 }
 
 injectResponsiveStyles();
