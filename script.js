@@ -38,6 +38,29 @@ const injectResponsiveStyles = () => {
     #login-dropdown .menu-item:hover { background: #333; }
     #login-dropdown .menu-item.danger { color: #ff6b6b; border-top: 1px solid #333; }
 
+    /* いいねボタンのスタイル */
+    .like-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: auto;
+      color: #888;
+      font-size: 0.9rem;
+    }
+    .like-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #555;
+      transition: transform 0.2s, color 0.2s;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .like-btn.liked { color: #ff4757; transform: scale(1.2); }
+    .like-btn:hover { transform: scale(1.1); }
+
     header nav {
       display: flex;
       align-items: center;
@@ -570,6 +593,11 @@ if (libraryGrid) {
         const isAdmin = user && user.email === adminEmail;
         const isGuestStory = story.uid === "guest";
 
+        // いいね状態の判定
+        const likedBy = story.likedBy || [];
+        const likeCount = likedBy.length;
+        const isLiked = user && likedBy.includes(user.uid);
+
         const card = document.createElement('div');
         card.className = 'story-card';
         
@@ -594,6 +622,12 @@ if (libraryGrid) {
           <p class="story-author">by ${story.author}</p>
           <p class="story-desc">${cleanDesc}</p>
           <div class="card-buttons">
+            <div class="like-container">
+              <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${storyId}">
+                ${isLiked ? '❤️' : '♡'}
+              </button>
+              <span class="like-count">${likeCount}</span>
+            </div>
             <button class="btn primary user-story-btn" data-id="${storyId}">読む</button>
           </div>
         `;
@@ -630,6 +664,42 @@ if (libraryGrid) {
       });
       dropdown.classList.toggle('show');
       e.stopPropagation();
+      return;
+    }
+
+    // いいねボタンの処理
+    if (e.target.closest('.like-btn')) {
+      const btn = e.target.closest('.like-btn');
+      const storyId = btn.dataset.id;
+      const user = window.auth.currentUser;
+
+      if (!user) {
+        alert('いいねするにはログインが必要です');
+        return;
+      }
+
+      const docRef = window.doc(window.db, 'stories', storyId);
+      const isLiked = btn.classList.contains('liked');
+      const countEl = btn.nextElementSibling;
+      let currentCount = parseInt(countEl.textContent);
+
+      try {
+        if (isLiked) {
+          // いいね解除
+          await window.updateDoc(docRef, { likedBy: window.arrayRemove(user.uid) });
+          btn.classList.remove('liked');
+          btn.textContent = '♡';
+          countEl.textContent = currentCount - 1;
+        } else {
+          // いいね登録
+          await window.updateDoc(docRef, { likedBy: window.arrayUnion(user.uid) });
+          btn.classList.add('liked');
+          btn.textContent = '❤️';
+          countEl.textContent = currentCount + 1;
+        }
+      } catch (err) {
+        console.error("いいね更新失敗:", err);
+      }
       return;
     }
 

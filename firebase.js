@@ -12,7 +12,9 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  where
+  where,
+  arrayUnion,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 import {
   getAuth,
@@ -52,6 +54,8 @@ window.orderBy = orderBy;
 window.query = query;
 window.where = where;
 window.serverTimestamp = serverTimestamp;
+window.arrayUnion = arrayUnion;
+window.arrayRemove = arrayRemove;
 window.auth = auth;
 window.provider = provider;
 window.signInWithPopup = signInWithPopup;
@@ -84,7 +88,8 @@ window.addEventListener('publishStory', async (e) => {
         ...storyData,
         uid: user ? user.uid : "guest",
         isGuest: !user,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        likedBy: [] // いいねしたユーザーのIDを保存する配列を初期化
       });
       console.log("保存成功", docRef.id);
     }
