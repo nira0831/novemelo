@@ -974,6 +974,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // 読書画面：一行ずつ表示する演出
 const textBody = document.querySelector('.text-body');
 if (textBody) {
+  // いいねボタンの状態を更新する関数
+  const updateReaderLikeIcons = (storyId, likedBy) => {
+    const user = window.auth ? window.auth.currentUser : null;
+    const isLiked = user && likedBy && likedBy.includes(user.uid);
+    
+    document.querySelectorAll(`.reader-like-btn[data-id="${storyId}"]`).forEach(btn => {
+      btn.classList.toggle('liked', !!isLiked);
+      btn.innerHTML = isLiked ? '❤️' : '♡';
+    });
+  };
+
   // いいね処理の共通関数
   const handleReaderLike = async (btn, storyId) => {
     const user = window.auth.currentUser;
@@ -989,12 +1000,12 @@ if (textBody) {
       } else {
         await window.updateDoc(docRef, { likedBy: window.arrayUnion(user.uid) });
       }
-      // ページ内の全てのリーダー用いいねボタンの状態を同期
-      document.querySelectorAll(`.reader-like-btn[data-id="${storyId}"]`).forEach(b => {
-        const liked = !isLiked;
-        b.classList.toggle('liked', liked);
-        b.textContent = liked ? '❤️' : '♡';
-      });
+      // 最新の状態を取得するために再読み込み（または手動で配列を更新して再描画）
+      // ここでは簡易的に即時反映
+      const docSnap = await window.getDoc(docRef);
+      if (docSnap.exists()) {
+        updateReaderLikeIcons(storyId, docSnap.data().likedBy || []);
+      }
     } catch (err) {
       console.error("いいね更新失敗:", err);
     }
@@ -1002,6 +1013,11 @@ if (textBody) {
 
   (async () => {
     // --- Firebaseから物語を読み込み ---
+    // FirebaseとAuthの準備ができるまで待機
+    while (!window.db || !window.auth || !window.getDoc) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+
     const storyId = localStorage.getItem('current_story_id');
     if (storyId) {
       try {
@@ -1033,36 +1049,42 @@ if (textBody) {
           lines = textBody.querySelectorAll('p');
 
           // --- いいねボタンの設置 ---
-          const user = window.auth.currentUser;
-          const likedBy = story.likedBy || [];
-          const isLiked = user && likedBy.includes(user.uid);
-
           // PC用（フッター: 一覧に戻るボタンの横）
           const footer = document.querySelector('.reader-footer');
           if (footer) {
-            const footerLikeBtn = document.createElement('button');
-            footerLikeBtn.className = 'reader-like-btn';
-            footerLikeBtn.dataset.id = storyId;
-            footerLikeBtn.innerHTML = isLiked ? '❤️' : '♡';
-            if (isLiked) footerLikeBtn.classList.add('liked');
-            footerLikeBtn.onclick = () => handleReaderLike(footerLikeBtn, storyId);
-            footer.appendChild(footerLikeBtn);
+            if (!footer.querySelector(`.reader-like-btn[data-id="${storyId}"]`)) {
+              const footerLikeBtn = document.createElement('button');
+              footerLikeBtn.className = 'reader-like-btn';
+              footerLikeBtn.dataset.id = storyId;
+              footerLikeBtn.onclick = () => handleReaderLike(footerLikeBtn, storyId);
+              footer.appendChild(footerLikeBtn);
+            }
           }
 
           // スマホ用（ヘッダー: ログインボタンの下）
-          const headerNav = document.querySelector('header nav');
-          if (headerNav) {
+          // header navが見つからない場合に備えて、login-btnの親要素を探す
+          const loginBtn = document.getElementById('login-btn');
+          const headerNav = document.querySelector('header nav') || (loginBtn ? loginBtn.parentElement : null);
+          
+          if (headerNav && !headerNav.querySelector('.header-like-container')) {
             const container = document.createElement('div');
             container.className = 'header-like-container';
             const headerLikeBtn = document.createElement('button');
             headerLikeBtn.className = 'reader-like-btn';
             headerLikeBtn.dataset.id = storyId;
-            headerLikeBtn.innerHTML = isLiked ? '❤️' : '♡';
-            if (isLiked) headerLikeBtn.classList.add('liked');
             headerLikeBtn.onclick = () => handleReaderLike(headerLikeBtn, storyId);
             container.appendChild(headerLikeBtn);
             headerNav.appendChild(container);
           }
+
+          // 初期表示の更新
+          updateReaderLikeIcons(storyId, story.likedBy || []);
+
+          // ログイン状態が変わった時にもハートを更新するようにする
+          window.onAuthStateChanged(window.auth, () => {
+            updateReaderLikeIcons(storyId, story.likedBy || []);
+          });
+
         }
       } catch (e) {
         console.error("物語の取得に失敗しました:", e);
