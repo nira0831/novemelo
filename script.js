@@ -7,6 +7,22 @@ const injectResponsiveStyles = () => {
   const style = document.createElement('style');
   style.id = 'responsive-styles';
   style.textContent = `
+    #audio-play-hint {
+      position: fixed;
+      z-index: 1001;
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+      display: none;
+    }
+    #audio-play-hint:hover { background: #3498db; transform: scale(1.05); }
+
     @media screen and (max-width: 768px) {
       /* 全ページのロゴサイズを統一 */
       .logo, .logo a { 
@@ -58,7 +74,7 @@ const injectResponsiveStyles = () => {
       #mobile-next-btn { display: block !important; position: fixed !important; bottom: 20px !important; left: 5% !important; width: 90% !important; margin: 0 !important; padding: 12px !important; font-size: 1rem !important; border-radius: 12px !important; box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important; z-index: 1000 !important; background: #2980b9 !important; border: none !important; color: white !important; font-weight: bold !important; text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important; }
       #back-to-library { text-align: center; padding: 12px !important; background: rgba(255,255,255,0.05); border-radius: 10px; display: none !important; } /* 初期非表示 */
       .volume-control { width: 160px !important; margin: 5px 0 15px auto !important; padding: 8px 12px !important; background: rgba(255, 255, 255, 0.1); border-radius: 20px; justify-content: space-between !important; }
-      #audio-play-hint { position: fixed !important; bottom: 100px; right: 20px; top: auto !important; left: auto !important; background: rgba(0,0,0,0.85) !important; padding: 10px 15px !important; border-radius: 8px !important; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+      #audio-play-hint { bottom: 100px !important; right: 20px !important; top: auto !important; left: auto !important; font-size: 14px !important; padding: 12px 20px !important; }
       .sound-marker { width: 40px !important; }
       .sound-card { padding: 15px !important; font-size: 1rem !important; margin-bottom: 10px !important; }
 
@@ -89,10 +105,14 @@ const injectResponsiveStyles = () => {
 const createAudioHint = () => {
   if (audioHintElement) return; // Already created
 
-  audioHintElement = document.createElement('div');
+  audioHintElement = document.createElement('button');
   audioHintElement.id = 'audio-play-hint'; // New ID for styling
   audioHintElement.textContent = 'クリックで音楽を再生'; // The desired text
   audioHintElement.style.display = 'none'; // Initially hidden
+
+  // ボタン自体のクリックでも再生を開始するようにする
+  audioHintElement.addEventListener('click', startHomeBgm);
+
   document.body.appendChild(audioHintElement);
 
   updateAudioHintPosition();
