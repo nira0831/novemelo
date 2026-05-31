@@ -1344,12 +1344,24 @@ if (loginBtn) {
         loginBtn.parentElement.appendChild(dropdown);
 
         dropdown.querySelector('#go-my-stories').addEventListener('click', () => {
-          location.href = 'novels.html?filter=mine';
+          const container = document.querySelector('.container');
+          if (container) container.classList.add('camera-down-leave');
+          
+          if (window.playPageTurn) window.playPageTurn();
+          if (window.saveBgmTime) window.saveBgmTime();
+          
+          setTimeout(() => {
+            location.href = 'novels.html?filter=mine';
+          }, 700);
         });
 
         dropdown.querySelector('#logout-action').addEventListener('click', () => {
           if (confirm('ログアウトしますか？')) {
-            window.signOut(window.auth);
+            window.signOut(window.auth).then(() => {
+              // ログアウト後はトップへ戻る演出
+              saveBgmTime();
+              location.href = 'index.html';
+            });
           }
         });
 
