@@ -82,8 +82,15 @@ const injectResponsiveStyles = () => {
         text-decoration: none !important;
       }
       
+      header nav {
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        padding: 5px 0 !important;
+      }
+      .logo { align-self: flex-start !important; }
+
       #login-btn {
-        margin: 10px 15px 10px auto !important;
+        margin: 0 15px 10px auto !important;
         padding: 5px 12px !important; /* モバイルでは少しコンパクトに */
       }
 
