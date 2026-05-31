@@ -8,6 +8,7 @@ import {
   getDoc,
   doc,
   deleteDoc,
+  updateDoc,
   orderBy,
   query,
   serverTimestamp
@@ -45,6 +46,7 @@ window.getDocs = getDocs;
 window.getDoc = getDoc;
 window.doc = doc;
 window.deleteDoc = deleteDoc;
+window.updateDoc = updateDoc;
 window.orderBy = orderBy;
 window.query = query;
 window.serverTimestamp = serverTimestamp;
@@ -56,23 +58,29 @@ window.signOut = signOut;
 
 // script.js から発火される「publishStory」イベントを検知し、Firestoreに保存する
 window.addEventListener('publishStory', async (e) => {
-  const story = e.detail;
+  const { id, ...storyData } = e.detail;
   const user = auth.currentUser;
 
-  if (!user) {
-    alert("ログインが必要です");
-    return;
-  }
-
   try {
-    // Firebaseへ保存
-    const docRef = await addDoc(collection(db, 'stories'), {
-      ...story,
-      uid: user.uid, // 投稿者IDを保存
-      createdAt: serverTimestamp() // サーバー側の日時を使用
-    });
-
-    console.log("保存成功", docRef.id);
+    if (id) {
+      // 既存作品の更新
+      const docRef = doc(db, 'stories', id);
+      await updateDoc(docRef, {
+        ...storyData,
+        updatedAt: serverTimestamp()
+      });
+      console.log("更新成功", id);
+      localStorage.removeItem('edit_story_id');
+    } else {
+      // 新規保存
+      const docRef = await addDoc(collection(db, 'stories'), {
+        ...storyData,
+        uid: user ? user.uid : "guest",
+        isGuest: !user,
+        createdAt: serverTimestamp()
+      });
+      console.log("保存成功", docRef.id);
+    }
 
     // 下書きをクリア
     localStorage.removeItem('draft_story');

@@ -50,6 +50,27 @@ const injectResponsiveStyles = () => {
       color: #fff !important;
     }
 
+    .story-card { position: relative !important; }
+    .story-menu { position: absolute; top: 12px; right: 12px; }
+    .menu-btn { 
+      background: none; border: none; color: #888; font-size: 1.4rem; 
+      cursor: pointer; padding: 0 8px; line-height: 1; transition: color 0.2s; 
+    }
+    .menu-btn:hover { color: #fff; }
+    .menu-dropdown { 
+      display: none; position: absolute; right: 0; top: 30px; 
+      background: #222; border: 1px solid #444; border-radius: 8px; 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 100; min-width: 120px; 
+      overflow: hidden; 
+    }
+    .menu-dropdown.show { display: block; }
+    .menu-item { 
+      padding: 12px 16px; color: #eee; font-size: 0.85rem; 
+      cursor: pointer; text-align: left; transition: background 0.2s;
+    }
+    .menu-item:hover { background: #333; }
+    .menu-item.danger { color: #ff6b6b; border-top: 1px solid #333; }
+
     @media screen and (max-width: 768px) {
       /* 全ページのロゴサイズを統一 */
       .logo, .logo a { 
@@ -278,6 +299,7 @@ const writeBtn = document.getElementById('write-btn');
 if (writeBtn) {
   writeBtn.addEventListener('click', () => {
     const container = document.querySelector('.container');
+    localStorage.removeItem('edit_story_id'); // 新規作成時は編集IDを消去
     if (container) container.classList.add('camera-down-leave');
     playPageTurn();
     saveBgmTime();
@@ -361,20 +383,26 @@ if (publishBtn) {
       return;
     }
 
-    // ログインチェック
-    if (!window.auth || !window.auth.currentUser) {
-      alert('投稿するにはGoogleログインが必要です。');
-      return;
+    // ゲスト投稿時の編集コード取得
+    let deleteKey = null;
+    const editId = localStorage.getItem('edit_story_id');
+    if (!editId && (!window.auth || !window.auth.currentUser)) {
+      deleteKey = prompt("この投稿を後で編集・削除するための「編集コード」を設定してください（任意・英数字推奨）");
+      // キャンセルされた場合は中断
+      if (deleteKey === null) return;
     }
 
     const newStory = {
+      id: editId,
       title: titleInput.value.trim() || '無題の物語',
       author: authorInput.value.trim() || '名無しさん',
       // 作品一覧の著作者名の下に表示する文として「前置き」を使用
       desc: prefaceInput ? prefaceInput.value.trim() : '',
       preface: prefaceInput ? prefaceInput.value : '',
-      content: contentInput.value
+      content: contentInput.value,
     };
+
+    if (deleteKey) newStory.deleteKey = deleteKey; // ゲスト用の削除キー
 
     // Firebase保存用のカスタムイベントを発火
     const firebaseEvent = new CustomEvent('publishStory', { detail: newStory });
@@ -409,6 +437,30 @@ if (draftBtn) {
   // 執筆画面であればページ読み込み時に下書きを復元
   const titleInput = document.getElementById('editor-title');
   if (titleInput) {
+    const editId = localStorage.getItem('edit_story_id');
+    if (editId && editId !== "undefined") {
+      // 編集モード：Firestoreから最新データを取得
+      (async () => {
+        try {
+          const docRef = window.doc(window.db, 'stories', editId);
+          const docSnap = await window.getDoc(docRef);
+          if (docSnap.exists()) {
+            const story = docSnap.data();
+            titleInput.value = story.title || '';
+            const authorInput = document.getElementById('editor-author');
+            if (authorInput) authorInput.value = story.author || '';
+            const prefaceInput = document.getElementById('editor-preface');
+            if (prefaceInput) prefaceInput.value = story.preface || '';
+            const contentInput = document.getElementById('editor-body');
+            if (contentInput) contentInput.value = story.content || '';
+            setTimeout(updateSoundIndicator, 0); // 描画後に実行
+          }
+        } catch (e) {
+          console.error("作品の読み込みに失敗しました:", e);
+        }
+      })();
+    } else {
+      // 通常の下書き復元
     const savedDraft = localStorage.getItem('draft_story');
     if (savedDraft && savedDraft !== "undefined") {
       try {
@@ -424,6 +476,7 @@ if (draftBtn) {
       } catch (e) {
         console.error("下書きの復元に失敗しました。データが壊れている可能性があります:", e);
       }
+    }
     }
   }
 }
@@ -443,9 +496,10 @@ if (libraryGrid) {
         const story = doc.data();
         const storyId = doc.id;
 
-        // 権限チェック: 投稿者本人か、管理者であれば削除ボタンを許可
+        // 権限チェック: 投稿者本人、管理者、またはゲスト投稿(誰でもコードで編集・削除を試みれる)
         const isOwner = user && story.uid === user.uid;
         const isAdmin = user && user.email === adminEmail;
+        const isGuestStory = story.uid === "guest";
 
         const card = document.createElement('div');
         card.className = 'story-card';
@@ -454,17 +508,24 @@ if (libraryGrid) {
         let cleanDesc = descText.replace(/\[(BGM|SE|BG):.+?\]/g, '').replace(/\n/g, ' ');
         if (cleanDesc.length > 80) cleanDesc = cleanDesc.substring(0, 80) + '...';
 
-        const deleteBtnHtml = (isOwner || isAdmin)
-          ? `<button class="btn danger delete-story-btn" data-id="${storyId}">削除</button>`
-          : '';
+        const canShowMenu = isOwner || isAdmin || isGuestStory;
+        const menuHtml = canShowMenu ? `
+          <div class="story-menu">
+            <button class="menu-btn">···</button>
+            <div class="menu-dropdown">
+              <div class="menu-item edit-story-btn" data-id="${storyId}">編集する</div>
+              <div class="menu-item danger delete-story-btn" data-id="${storyId}">削除する</div>
+            </div>
+          </div>
+        ` : '';
 
         card.innerHTML = `
+          ${menuHtml}
           <h3>${story.title}</h3>
           <p class="story-author">by ${story.author}</p>
           <p class="story-desc">${cleanDesc}</p>
-          <div class="card-buttons" style="display: flex; gap: 10px;">
+          <div class="card-buttons">
             <button class="btn primary user-story-btn" data-id="${storyId}">読む</button>
-            ${deleteBtnHtml}
           </div>
         `;
         libraryGrid.appendChild(card);
@@ -482,7 +543,18 @@ if (libraryGrid) {
   }
 
   // 動的に生成されたボタンへのクリックイベント（委譲）
-  libraryGrid.addEventListener('click', (e) => {
+  libraryGrid.addEventListener('click', async (e) => {
+    // メニューボタンのトグル
+    if (e.target.classList.contains('menu-btn')) {
+      const dropdown = e.target.nextElementSibling;
+      document.querySelectorAll('.menu-dropdown.show').forEach(el => {
+        if (el !== dropdown) el.classList.remove('show');
+      });
+      dropdown.classList.toggle('show');
+      e.stopPropagation();
+      return;
+    }
+
     if (e.target.classList.contains('user-story-btn')) {
       const storyId = e.target.dataset.id;
       localStorage.setItem('current_story_id', storyId);
@@ -498,17 +570,93 @@ if (libraryGrid) {
       }, 700);
     }
 
-    if (e.target.classList.contains('delete-story-btn')) {
-      if (confirm('この物語をFirebaseから削除してもよろしいですか？')) {
-        const storyId = e.target.dataset.id;
-        window.deleteDoc(window.doc(window.db, 'stories', storyId)).then(() => {
-          e.target.closest('.story-card').remove();
-        }).catch(err => {
-          alert("削除に失敗しました");
-          console.error(err);
-        });
-        
+    if (e.target.classList.contains('edit-story-btn')) {
+      const storyId = e.target.dataset.id;
+      
+      try {
+        const docRef = window.doc(window.db, 'stories', storyId);
+        const docSnap = await window.getDoc(docRef);
+        if (!docSnap.exists()) return;
+        const story = docSnap.data();
+
+        const user = window.auth.currentUser;
+        const adminEmail = "soundnovelnira@gmail.com";
+        const isOwner = user && story.uid === user.uid;
+        const isAdmin = user && user.email === adminEmail;
+
+        // 編集権限の確認
+        if (!isOwner && !isAdmin) {
+          if (story.uid === 'guest') {
+            const code = prompt("編集するために編集コードを入力してください");
+            if (code === null) return;
+            if (story.deleteKey && code !== story.deleteKey) {
+              alert("コードが一致しません");
+              return;
+            } else if (!story.deleteKey) {
+              alert("この投稿は編集コードが設定されていないため、管理者のみ編集可能です。");
+              return;
+            }
+          } else {
+            alert("編集権限がありません");
+            return;
+          }
+        }
+
+        // 権限確認完了、編集画面へ
+        localStorage.setItem('edit_story_id', storyId);
+        const container = document.querySelector('.container');
+        if (container) container.classList.add('camera-down-leave');
+        saveBgmTime();
         playPageTurn();
+        setTimeout(() => {
+          location.href = 'write.html';
+        }, 700);
+      } catch (err) {
+        console.error(err);
+        alert("読み込みに失敗しました");
+      }
+    }
+
+    if (e.target.classList.contains('delete-story-btn')) {
+      const storyId = e.target.dataset.id;
+      
+      try {
+        const docRef = window.doc(window.db, 'stories', storyId);
+        const docSnap = await window.getDoc(docRef);
+        if (!docSnap.exists()) return;
+        const story = docSnap.data();
+
+        const user = window.auth.currentUser;
+        const adminEmail = "soundnovelnira@gmail.com";
+        const isOwner = user && story.uid === user.uid;
+        const isAdmin = user && user.email === adminEmail;
+
+        // 削除権限の確認
+        if (!isOwner && !isAdmin) {
+          if (story.uid === 'guest') {
+            const code = prompt("編集コードを入力してください");
+            if (code === null) return;
+            if (story.deleteKey && code !== story.deleteKey) {
+              alert("編集コードが一致しません");
+              return;
+            } else if (!story.deleteKey) {
+              alert("この投稿は編集コードが設定されていないため、管理者のみ削除可能です。");
+              return;
+            }
+          } else {
+            alert("削除権限がありません");
+            return;
+          }
+        }
+
+        if (confirm('この物語をFirebaseから削除してもよろしいですか？')) {
+          await window.deleteDoc(docRef);
+          e.target.closest('.story-card').remove();
+          if (window.playPageTurn) window.playPageTurn();
+        }
+      } catch (err) {
+        console.error(err);
+        alert("削除に失敗しました");
       }
     }
   });
@@ -1136,5 +1284,10 @@ if (loginBtn) {
 
   initAuth();
 }
+
+// メニュー外をクリックした時に全てのドロップダウンを閉じる
+window.addEventListener('click', () => {
+  document.querySelectorAll('.menu-dropdown.show').forEach(el => el.classList.remove('show'));
+});
 
 injectResponsiveStyles();
