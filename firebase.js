@@ -74,6 +74,7 @@ window.addEventListener('publishStory', async (e) => {
       const docRef = doc(db, 'stories', id);
       const updateData = {
         ...storyData,
+        isPreview: false,
         updatedAt: serverTimestamp()
       };
       if (user) {
@@ -89,6 +90,7 @@ window.addEventListener('publishStory', async (e) => {
         ...storyData,
         uid: user ? user.uid : "guest",
         isGuest: !user,
+        isPreview: false,
         createdAt: serverTimestamp(),
         likedBy: [] // いいねしたユーザーのIDを保存する配列を初期化
       });
@@ -116,5 +118,40 @@ window.addEventListener('publishStory', async (e) => {
   } catch (error) {
     console.error(error);
     window.customDialog.alert('投稿に失敗しました');
+  }
+});
+
+// プレビュー用の一時保存
+window.addEventListener('previewStory', async (e) => {
+  const storyData = e.detail;
+  const user = auth.currentUser;
+
+  try {
+    // プレビューとして新規保存（isPreviewフラグを立てる）
+    const docRef = await addDoc(collection(db, 'stories'), {
+      ...storyData,
+      uid: user ? user.uid : "guest",
+      isGuest: !user,
+      isPreview: true, 
+      createdAt: serverTimestamp(),
+      likedBy: []
+    });
+
+    // 読書画面へ遷移するための情報をセット
+    localStorage.setItem('current_story_id', docRef.id);
+    localStorage.setItem('is_preview_mode', 'true');
+
+    // 演出
+    const container = document.querySelector('.container');
+    if (container) container.classList.add('camera-down-leave');
+    if (window.playPageTurn) window.playPageTurn();
+    if (window.saveBgmTime) window.saveBgmTime();
+
+    setTimeout(() => {
+      location.href = 'read.html';
+    }, 700);
+  } catch (error) {
+    console.error(error);
+    window.customDialog.alert('プレビューの準備に失敗しました');
   }
 });

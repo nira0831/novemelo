@@ -555,6 +555,27 @@ document.querySelectorAll('.story-card .btn.primary').forEach(btn => {
   });
 });
 
+// --- プレビュー機能の実装 ---
+const previewBtn = document.getElementById('preview-btn');
+if (previewBtn) {
+  previewBtn.addEventListener('click', () => {
+    const titleInput = document.getElementById('editor-title');
+    const authorInput = document.getElementById('editor-author');
+    const prefaceInput = document.getElementById('editor-preface');
+    const contentInput = document.getElementById('editor-body');
+
+    const previewData = {
+      title: titleInput.value.trim() || '無題の物語',
+      author: authorInput.value.trim() || '名無しさん',
+      desc: prefaceInput ? prefaceInput.value.trim() : '',
+      preface: prefaceInput ? prefaceInput.value : '',
+      content: contentInput.value,
+    };
+
+    window.dispatchEvent(new CustomEvent('previewStory', { detail: previewData }));
+  });
+}
+
 // --- 投稿機能の実装 ---
 const publishBtn = document.getElementById('publish-btn');
 if (publishBtn) {
@@ -733,6 +754,9 @@ if (libraryGrid) {
       querySnapshot.forEach((doc) => {
         const story = doc.data();
         const storyId = doc.id;
+
+        // プレビュー用データは一覧に表示しない
+        if (story.isPreview === true) return;
 
         // 権限チェック: 投稿者本人、管理者、またはゲスト投稿(誰でもコードで編集・削除を試みれる)
         const isOwner = user && story.uid === user.uid;
@@ -1239,13 +1263,16 @@ if (textBody) {
     };
 
     const storyId = localStorage.getItem('current_story_id');
+    const isPreviewMode = localStorage.getItem('is_preview_mode') === 'true';
+
     if (storyId) {
       // --- Firestoreから読み込み（通常読書） ---
       try {
         const docSnap = await window.getDoc(window.doc(window.db, 'stories', storyId));
         if (docSnap.exists()) {
           const story = docSnap.data();
-          setupStory(story.title, story.author, story.content, story.likedBy || [], storyId);
+          // プレビューモードならIDをnullで渡して「エディタに戻る」ボタンを出す
+          setupStory(story.title, story.author, story.content, story.likedBy || [], isPreviewMode ? null : storyId);
         }
       } catch (e) {
         console.error("物語の取得に失敗しました:", e);
