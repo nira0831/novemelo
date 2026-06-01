@@ -27,7 +27,8 @@ import {
 // Firebase設定
 const firebaseConfig = {
   apiKey: "AIzaSyCjNCNR7ur2_f_4DNaH09Bceex_69htNiE",
-  authDomain: "soundnovel-nira14.firebaseapp.com",
+  // ここが実際の Firebase プロジェクト ID と一致しているか確認してください
+  authDomain: "soundnovel-nira14.firebaseapp.com", 
   projectId: "soundnovel-nira14",
   storageBucket: "soundnovel-nira14.firebasestorage.app",
   messagingSenderId: "967512531407",

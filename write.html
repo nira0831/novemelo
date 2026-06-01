@@ -122,7 +122,7 @@
             </div>
             <div class="container">
                 <header>
-                    <nav><div class="logo"><img src="novemelo-rogo.png" alt="ノベメロ" style="height: 30px; vertical-align: middle;"> (プレビュー)</div></nav>
+                    <nav><div class="logo">novemelo (プレビュー)</div></nav>
                 </header>
                 <div class="reader-section">
                     <div class="reader-content">
@@ -144,6 +144,7 @@
         let previewLines = [];
         let currentPreviewIndex = 0;
 
+        const tagRegexForExec = /\[(BGM|SE|BG):(.+?)\]/g; // Separate regex for exec
         const fadeOut = (audio, duration = 1000) => {
             const startVolume = audio.volume;
             const step = startVolume / (duration / 50);
@@ -179,10 +180,11 @@
                 const p = lineData.el;
                 const currentVolume = document.getElementById('volume-slider').value;
 
+                tagRegexForExec.lastIndex = 0; // Reset regex for each line before exec
                 // 音響演出の解析
                 const currentLineTags = [];
                 let match;
-                while ((match = tagRegex.exec(rawText)) !== null) {
+                while ((match = tagRegexForExec.exec(rawText)) !== null) {
                     const [_, type, id] = match;
                     if (type === 'BG') {
                         if (id.startsWith('#') || id.includes('rgb') || ['black', 'white'].includes(id)) {
@@ -214,6 +216,7 @@
 
                 // 表示処理
                 p.classList.add('is-visible');
+                p.textContent = rawText.replace(/\[(BGM|SE|BG):(.+?)\]/g, '').trim();
                 p.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 currentPreviewIndex++;
             } else {
@@ -245,7 +248,6 @@
             bodyContainer.innerHTML = '';
             previewLines = [];
             currentPreviewIndex = 0;
-            const tagRegex = /\[(BGM|SE|BG):(.+?)\]/g;
 
             // 空行を除去し、事前にタグを抜いたテキストを設定しておく（高さ計算のズレを防止）
             body.split('\n')
@@ -253,8 +255,7 @@
                 .filter(line => line !== "")
                 .forEach(lineText => {
                     const p = document.createElement('p');
-                    // タグを抜いた状態のテキストを先に入れておくことで、ブラウザが正しい高さを把握できる
-                    p.textContent = lineText.replace(tagRegex, '');
+                    p.textContent = lineText; // タグを除去せず、生のテキストをtextContentに設定する
                     bodyContainer.appendChild(p);
                     previewLines.push({ el: p, raw: lineText });
                 });

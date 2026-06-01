@@ -1254,7 +1254,7 @@ if (textBody) {
       const savedDraft = localStorage.getItem('draft_story');
       if (savedDraft) {
         const draft = JSON.parse(savedDraft);
-        setupStory(draft.title || '（無題のプレビュー）', draft.author || '名無しさん', draft.content || [], [], null);
+        setupStory(draft.title || '（無題のプレビュー）', draft.author || '名無しさん', draft.content || '', [], null);
       }
     }
   })();
@@ -1359,7 +1359,7 @@ if (textBody) {
       }
 
       // 表示からタグを消去
-      currentLine.textContent = originalText.replace(tagRegex, '');
+      currentLine.textContent = originalText.replace(/\[(BGM|SE|BG):(.+?)\]/g, ''); // Use a fresh regex literal for replace
 
       // タグを除去した結果、空行になった場合は自動で次へ（演出のみの行を飛ばす）
       if (currentLine.textContent.trim() === "" && currentLineIndex < lines.length - 1) {
