@@ -3,8 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>soundnovel - ホーム</title>
+    <title>ノベメロ - ホーム</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ヒーローロゴのカスタマイズ */
+        .hero-logo-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: logo-float 4s ease-in-out infinite;
+            cursor: default;
+        }
+        .hero-logo-img {
+            max-width: 450px;
+            height: auto;
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
+            mix-blend-mode: multiply;
+        }
+        @keyframes logo-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1.5deg); }
+        }
+        @media screen and (max-width: 768px) {
+            .hero-logo-img { max-width: 80%; }
+        }
+    </style>
 </head>
 <body>
     <div class="volume-control">
@@ -21,13 +45,15 @@
     <div class="container">
         <header>
             <nav>
-                <div class="logo"><a href="index.html">soundnovel</a></div>
+                <div class="logo"><a href="index.html">novemelo</a></div>
                 <button id="login-btn" class="btn secondary">Googleでログイン</button>
             </nav>
         </header>
 
         <main class="hero-section">
-            <h1>soundnovel</h1>
+            <div class="hero-logo-container">
+                <img src="novemelo-rogo.png" alt="ノベメロ" class="hero-logo-img">
+            </div>
             <p class="subtitle">作品を読んで聴いて書いて楽しもう</p>
             <div class="cta-buttons">
                 <button id="read-btn" class="btn primary">作品を読む</button>
@@ -36,7 +62,7 @@
         </main>
 
         <footer>
-            <p>&copy;soundnovel</p>
+            <p>&copy;novemelo</p>
             <p class="credits" style="font-size: 0.8rem; margin-top: 10px; opacity: 0.8;">音楽：独り音 / 効果音：効果音ラボ</p>
         </footer>
     </div>

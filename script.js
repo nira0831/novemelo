@@ -939,7 +939,7 @@ if (libraryGrid) {
           }
         }
 
-        if (await customDialog.confirm('この物語をsoundnovelから削除してもよろしいですか？')) {
+        if (await customDialog.confirm('この物語をノベメロから削除してもよろしいですか？')) {
           await window.deleteDoc(docRef);
           e.target.closest('.story-card').remove();
           if (window.playPageTurn) window.playPageTurn();
